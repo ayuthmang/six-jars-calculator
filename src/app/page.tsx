@@ -1,112 +1,210 @@
-import Image from 'next/image'
+'use client'
+import React, { useEffect } from 'react'
+import classnames from 'classnames'
+
+const defaultCalculation = {
+  necessities: 0.55,
+  education: 0.1,
+  longTermSavings: 0.1,
+  financialFreedom: 0.1,
+  play: 0.1,
+  give: 0.05,
+}
+
+const toFixed = (num: number) => +num.toFixed(4)
+
+type JarsState = {
+  necessities: number
+  education: number
+  longTermSavings: number
+  financialFreedom: number
+  play: number
+  give: number
+}
+
+const jarsReducer = (
+  state: typeof defaultCalculation,
+  action: { type: string; value: number }
+): JarsState => {
+  const max = 1
+  const value = action.value / 100
+
+  switch (action.type) {
+    case 'necessities':
+      return { ...state, necessities: value }
+    case 'education':
+      return { ...state, education: value }
+    case 'longTermSavings':
+      return { ...state, longTermSavings: value }
+    case 'financialFreedom':
+      return { ...state, financialFreedom: value }
+    case 'play':
+      return { ...state, play: value }
+    case 'give':
+      return { ...state, give: value }
+
+    default:
+      return state
+  }
+}
+
+function Input({
+  label,
+  value,
+  onChange,
+  ...props
+}: React.ComponentPropsWithoutRef<'input'> & { label: string }) {
+  return (
+    <div>
+      <label htmlFor={label}>{label}</label>
+      <input
+        id={label}
+        type="number"
+        value={value}
+        onChange={onChange}
+        {...props}
+      />
+    </div>
+  )
+}
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">src/app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+  const [income, setIncome] = React.useState(0)
+  const [state, dispatch] = React.useReducer(jarsReducer, defaultCalculation)
+  const [calculatedResult, setCalculatedResult] =
+    React.useState<JarsState | null>(null)
 
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
+  useEffect(() => {
+    if (income === null || income === undefined) return
+
+    function calculate(state: JarsState, income: number) {
+      return {
+        necessities: toFixed(income * state.necessities),
+        education: toFixed(income * state.education),
+        longTermSavings: toFixed(income * state.longTermSavings),
+        financialFreedom: toFixed(income * state.financialFreedom),
+        play: toFixed(income * state.play),
+        give: toFixed(income * state.give),
+      }
+    }
+
+    setCalculatedResult(calculate(state, income))
+  }, [state, income])
+
+  return (
+    <main className="">
+      <div>
+        <label htmlFor="income">income</label>
+        <input
+          id="income"
+          type="number"
+          value={income}
+          onChange={(e) => setIncome(+e.target.value)}
         />
       </div>
 
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
+      <div>
+        <h2>Calculation config</h2>
+        <div>
+          <label htmlFor="necessities">necessities</label>
+          <input
+            id="necessities"
+            type="number"
+            onChange={(e) =>
+              dispatch({ type: 'necessities', value: +e.target.value })
+            }
+            min={0}
+            max={100}
+            value={toFixed(state.necessities * 100)}
+          />
+          %
+        </div>
+        <div>
+          <label htmlFor="education">education</label>
+          <input
+            id="education"
+            type="number"
+            onChange={(e) =>
+              dispatch({ type: 'education', value: +e.target.value })
+            }
+            min={0}
+            max={100}
+            value={toFixed(state.education * 100)}
+          />
+          %
+        </div>
+        <div>
+          <label htmlFor="longTermSavings">longTermSavings</label>
+          <input
+            id="longTermSavings"
+            type="number"
+            onChange={(e) =>
+              dispatch({ type: 'longTermSavings', value: +e.target.value })
+            }
+            min={0}
+            max={100}
+            value={toFixed(state.longTermSavings * 100)}
+          />
+          %
+        </div>
+        <div>
+          <label htmlFor="financialFreedom">financialFreedom</label>
+          <input
+            id="financialFreedom"
+            type="number"
+            onChange={(e) =>
+              dispatch({ type: 'financialFreedom', value: +e.target.value })
+            }
+            min={0}
+            max={100}
+            value={toFixed(state.financialFreedom * 100)}
+          />
+          %
+        </div>
+        <div>
+          <label htmlFor="play">play</label>
+          <input
+            id="play"
+            type="number"
+            onChange={(e) => dispatch({ type: 'play', value: +e.target.value })}
+            min={0}
+            max={100}
+            value={toFixed(state.play * 100)}
+          />
+          %
+        </div>
+        <div>
+          <label htmlFor="give">give</label>
+          <input
+            id="give"
+            type="number"
+            onChange={(e) => dispatch({ type: 'give', value: +e.target.value })}
+            min={0}
+            max={100}
+            value={toFixed(state.give * 100)}
+          />
+          %
+        </div>
+      </div>
 
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore the Next.js 13 playground.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{' '}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
+      <div className={classnames(`pt-2`)}>
+        <h2>Summary</h2>
+        {calculatedResult && (
+          <div>
+            <p>Necessities: {calculatedResult.necessities}</p>
+            <p>Education: {calculatedResult.education}</p>
+            <p>Long Term Savings: {calculatedResult.longTermSavings}</p>
+            <p>Financial Freedom: {calculatedResult.financialFreedom}</p>
+            <p>Play: {calculatedResult.play}</p>
+            <p>Give: {calculatedResult.give}</p>
+            <p>
+              Total:{' '}
+              {toFixed(
+                Object.values(calculatedResult).reduce((acc, v) => acc + v)
+              )}
+            </p>
+          </div>
+        )}
       </div>
     </main>
   )
