@@ -1,17 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { TrendingUp } from "lucide-react";
 import { Cell, Pie, PieChart } from "recharts";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
@@ -54,29 +45,21 @@ export function SixJarsSummaryPieChart({
   );
 
   return (
-    <Card className="flex flex-col self-start">
-      <CardHeader className="items-center pb-0">
-        <CardTitle>These are all the Jars</CardTitle>
-        <CardDescription>January - June 2024</CardDescription>
-      </CardHeader>
-      <CardContent className="flex-1 pb-0">
-        <ChartContainer
-          config={dynamicChartConfig}
-          className="mx-auto aspect-square min-h-[250px] max-h-full pb-0 [&_.recharts-pie-label-text]:fill-foreground"
-        >
-          <PieChart>
-            <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-            <Pie data={chartData} nameKey="key" dataKey="value" label>
-              {chartData.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={dynamicChartConfig[entry.key]?.color}
-                />
-              ))}
-            </Pie>
-          </PieChart>
-        </ChartContainer>
-      </CardContent>
-    </Card>
+    <ChartContainer
+      config={dynamicChartConfig}
+      className="mx-auto aspect-square min-h-[250px] max-h-full min-w-80 pb-0 [&_.recharts-pie-label-text]:fill-foreground"
+    >
+      <PieChart>
+        <ChartTooltip content={<ChartTooltipContent hideLabel />} />
+        <Pie data={chartData} nameKey="key" dataKey="value" label>
+          {chartData.map((entry, index) => (
+            <Cell
+              key={`cell-${index}`}
+              fill={dynamicChartConfig[entry.key]?.color}
+            />
+          ))}
+        </Pie>
+      </PieChart>
+    </ChartContainer>
   );
 }

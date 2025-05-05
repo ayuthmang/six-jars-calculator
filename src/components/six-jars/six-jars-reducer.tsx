@@ -14,6 +14,7 @@ export type SixJarsActions =
   | { type: "SET_FINANCIALFREEDOM"; value: number }
   | { type: "SET_PLAY"; value: number }
   | { type: "SET_GIVE"; value: number }
+  | { type: "RESET" }
   | { type: "CALC_SUMMARY" };
 
 export type SixJarsState = {
@@ -88,6 +89,14 @@ export const sixJarsReducer = (
       return { ...state, config: { ...state.config, play: action.value } };
     case "SET_GIVE":
       return { ...state, config: { ...state.config, give: action.value } };
+    case "RESET":
+      return {
+        config: {
+          ...defaultJarsState.config,
+          income: state.config.income,
+        },
+        summary: { ...defaultJarsState.summary },
+      };
     case "CALC_SUMMARY":
       const {
         income,

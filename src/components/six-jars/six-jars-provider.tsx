@@ -2,7 +2,7 @@ import {
   useSixJarsReducer,
   type SixJarsActions,
   type SixJarsState,
-} from "@/components/six-jars/six-jars.reducer";
+} from "@/components/six-jars/six-jars-reducer";
 import { createContext, useContext } from "react";
 
 type SixJarContextType = {
@@ -16,7 +16,6 @@ function useSixJarsContext() {
   if (!context) {
     throw new Error("useSixJarsContext must be used within a SixJarsProvider");
   }
-
   return context;
 }
 
