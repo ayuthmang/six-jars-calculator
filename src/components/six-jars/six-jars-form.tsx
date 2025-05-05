@@ -170,16 +170,12 @@ function PercentageInput({
 export function SixJarsForm() {
   const { state, dispatch } = useSixJarsContext();
   const form = useFormContext<z.infer<typeof sixJarsFormSchema>>();
-  console.log("state", state);
-  console.log("form", { form });
 
   function onSubmit(values: z.infer<typeof sixJarsFormSchema>) {
-    console.log(values);
     dispatch({ type: "CALC_SUMMARY" });
   }
 
   useEffect(() => {
-    console.log("useEffect", state.config);
     dispatch({ type: "CALC_SUMMARY" });
   }, [state.config]);
 
@@ -354,11 +350,11 @@ function SixJarsSummary() {
               <TypographyP>Give: {toDisplay(give)}</TypographyP>
             </CardContent>
           </Card>
-            <Card className="transition-shadow hover:shadow-lg">
-              <CardContent>
-                <TypographyP className="font-bold">Total: {total}</TypographyP>
-              </CardContent>
-            </Card>
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardContent>
+              <TypographyP className="font-bold">Total: {total}</TypographyP>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
