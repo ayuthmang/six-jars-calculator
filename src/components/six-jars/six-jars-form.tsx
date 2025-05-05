@@ -17,47 +17,62 @@ import {
 import { useForm, useFormContext } from "react-hook-form";
 import { TypographyH1, TypographyH2, TypographyP } from "../ui/typography";
 import { useSixJarsContext } from "./six-jars.provider";
+import { SixJarsSummaryPieChart } from "./six-jars-summary-pie-chart";
 
 const sixJarsFormSchema = z
   .object({
     income: z.coerce
       .number()
+      .min(0, "Income must be a positive number")
+      .max(10_000_000_000_000, "Income must be less than 10,000,000,000,000")
       .refine(
         (val) => /^\d+(\.\d{1,2})?$/.test(val.toString()),
         "Income must be a number with up to 2 decimal places"
       ),
     necessities: z.coerce
       .number()
+      .min(0)
+      .max(100)
       .refine(
         (val) => /^\d+(\.\d{1,2})?$/.test(val.toString()),
         "Necessities must be a number with up to 2 decimal places"
       ),
     longTermSavings: z.coerce
       .number()
+      .min(0)
+      .max(100)
       .refine(
         (val) => /^\d+(\.\d{1,2})?$/.test(val.toString()),
         "Long Term Savings must be a number with up to 2 decimal places"
       ),
     financialFreedom: z.coerce
       .number()
+      .min(0)
+      .max(100)
       .refine(
         (val) => /^\d+(\.\d{1,2})?$/.test(val.toString()),
         "Financial Freedom must be a number with up to 2 decimal places"
       ),
     education: z.coerce
       .number()
+      .min(0)
+      .max(100)
       .refine(
         (val) => /^\d+(\.\d{1,2})?$/.test(val.toString()),
         "Education must be a number with up to 2 decimal places"
       ),
     play: z.coerce
       .number()
+      .min(0)
+      .max(100)
       .refine(
         (val) => /^\d+(\.\d{1,2})?$/.test(val.toString()),
         "Play must be a number with up to 2 decimal places"
       ),
     give: z.coerce
       .number()
+      .min(0)
+      .max(100)
       .refine(
         (val) => /^\d+(\.\d{1,2})?$/.test(val.toString()),
         "Give must be a number with up to 2 decimal places"
@@ -91,7 +106,6 @@ export default function SixJars() {
     reValidateMode: "onChange",
     mode: "onChange",
   });
-  const { state } = useSixJarsContext();
 
   return (
     <div className="flex flex-col gap-4 mx-4">
@@ -99,7 +113,7 @@ export default function SixJars() {
       <Form {...form}>
         <SixJarsForm />
       </Form>
-      <SixJarsSummary {...state.summary} />
+      <SixJarsSummary />
     </div>
   );
 }
@@ -253,7 +267,7 @@ export function SixJarsForm() {
               label="Play"
               value={toDisplay(state.config.play * 100)}
               placeholder="10"
-              onChange={(value) => {
+              onChange={() => {
                 dispatch({
                   type: "SET_GIVE",
                   value: +form.getValues("give") / 100,
@@ -265,7 +279,7 @@ export function SixJarsForm() {
               label="Give"
               value={toDisplay(state.config.give * 100)}
               placeholder="5"
-              onChange={(value) => {
+              onChange={() => {
                 dispatch({
                   type: "SET_GIVE",
                   value: +form.getValues("give") / 100,
@@ -280,6 +294,7 @@ export function SixJarsForm() {
 }
 
 function SixJarsSummary() {
+  const { state } = useSixJarsContext();
   const {
     necessities,
     education,
@@ -288,52 +303,66 @@ function SixJarsSummary() {
     play,
     give,
     total,
-  } = useSixJarsContext().state.summary;
+  } = state.summary;
+
+  const chartData = [
+    { key: "necessities", value: necessities },
+    { key: "longTermSavings", value: longTermSavings },
+    { key: "education", value: education },
+    { key: "financialFreedom", value: financialFreedom },
+    { key: "play", value: play },
+    { key: "give", value: give },
+  ];
 
   return (
-    <div className="container mx-auto flex flex-col gap-4">
-      <TypographyH2>💰 Summary</TypographyH2>
-      <div className="grid grid-cols-3 gap-4">
-        <Card className="transition-shadow hover:shadow-lg">
-          <CardContent>
-            <TypographyP>Necessities: {toDisplay(necessities)}</TypographyP>
-          </CardContent>
-        </Card>
-        <Card className="transition-shadow hover:shadow-lg">
-          <CardContent>
-            <TypographyP>
-              Long Term Savings: {toDisplay(longTermSavings)}
-            </TypographyP>
-          </CardContent>
-        </Card>
-        <Card className="transition-shadow hover:shadow-lg">
-          <CardContent>
-            <TypographyP>Education: {toDisplay(education)}</TypographyP>
-          </CardContent>
-        </Card>
-        <Card className="transition-shadow hover:shadow-lg">
-          <CardContent>
-            <TypographyP>
-              Financial Freedom: {toDisplay(financialFreedom)}
-            </TypographyP>
-          </CardContent>
-        </Card>
-        <Card className="transition-shadow hover:shadow-lg">
-          <CardContent>
-            <TypographyP>Play: {toDisplay(play)}</TypographyP>
-          </CardContent>
-        </Card>
-        <Card className="transition-shadow hover:shadow-lg">
-          <CardContent>
-            <TypographyP>Give: {toDisplay(give)}</TypographyP>
-          </CardContent>
-        </Card>
+    <div className="flex flex-col gap-4">
+      <TypographyH2>📊 Summary</TypographyH2>
+      <div className="flex flex-row gap-4">
+        <SixJarsSummaryPieChart chartData={chartData} />
+        <div className="container mx-auto flex flex-col gap-4">
+          <div className="grid grid-cols-3 gap-4">
+            <Card className="transition-shadow hover:shadow-lg">
+              <CardContent>
+                <TypographyP>Necessities: {toDisplay(necessities)}</TypographyP>
+              </CardContent>
+            </Card>
+            <Card className="transition-shadow hover:shadow-lg">
+              <CardContent>
+                <TypographyP>
+                  Long Term Savings: {toDisplay(longTermSavings)}
+                </TypographyP>
+              </CardContent>
+            </Card>
+            <Card className="transition-shadow hover:shadow-lg">
+              <CardContent>
+                <TypographyP>Education: {toDisplay(education)}</TypographyP>
+              </CardContent>
+            </Card>
+            <Card className="transition-shadow hover:shadow-lg">
+              <CardContent>
+                <TypographyP>
+                  Financial Freedom: {toDisplay(financialFreedom)}
+                </TypographyP>
+              </CardContent>
+            </Card>
+            <Card className="transition-shadow hover:shadow-lg">
+              <CardContent>
+                <TypographyP>Play: {toDisplay(play)}</TypographyP>
+              </CardContent>
+            </Card>
+            <Card className="transition-shadow hover:shadow-lg">
+              <CardContent>
+                <TypographyP>Give: {toDisplay(give)}</TypographyP>
+              </CardContent>
+            </Card>
+          </div>
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardContent>
+              <TypographyP>Total: {total}</TypographyP>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-      <Card className="transition-shadow hover:shadow-lg">
-        <CardContent>
-          <TypographyP>Total: {total}</TypographyP>
-        </CardContent>
-      </Card>
     </div>
   );
 }
