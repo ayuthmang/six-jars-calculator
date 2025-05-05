@@ -1,6 +1,10 @@
 import { toFixed } from "@/utils/number";
+import { useReducer } from "react";
 
-type SixJarsActions =
+const MAX_CONFIG_VALUE = 1;
+const MIN_CONFIG_VALUE = 0;
+
+export type SixJarsActions =
   | { type: "SET_INCOME"; value: number }
   | { type: "SET_NECESSITIES"; value: number }
   | { type: "SET_EDUCATION"; value: number }
@@ -54,11 +58,12 @@ export const defaultJarsState: SixJarsState = {
 
 export const defaultConfig = {};
 
-export const jarsReducer = (
+export const sixJarsReducer = (
   state: typeof defaultJarsState,
   action: SixJarsActions
 ): SixJarsState => {
-  // Removed invalid assignment from action
+  const maxValue = 1;
+  const minValue = 0;
 
   switch (action.type) {
     case "SET_INCOME":
@@ -124,6 +129,13 @@ export const jarsReducer = (
       };
 
     default:
-      return state;
+      throw new Error(`Unhandled action type: ${action}`);
   }
 };
+
+export function useSixJarsReducer(
+  initialState: SixJarsState = defaultJarsState
+) {
+  const [state, dispatch] = useReducer(sixJarsReducer, initialState);
+  return { state, dispatch };
+}
