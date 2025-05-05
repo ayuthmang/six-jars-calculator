@@ -4,7 +4,13 @@ import { toDisplay } from "@/utils/number";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Card, CardContent } from "../ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 import { z } from "zod";
 import {
   Form,
@@ -18,6 +24,8 @@ import { useForm, useFormContext } from "react-hook-form";
 import { TypographyH1, TypographyH2, TypographyP } from "../ui/typography";
 import { useSixJarsContext } from "./six-jars.provider";
 import { SixJarsSummaryPieChart } from "./six-jars-summary-pie-chart";
+import { Button } from "../ui/button";
+import { defaultJarsState } from "./six-jars.reducer";
 
 const sixJarsFormSchema = z
   .object({
@@ -80,12 +88,13 @@ const sixJarsFormSchema = z
   })
   .refine(
     (data) =>
-      data.necessities +
+      (data.necessities +
         data.longTermSavings +
         data.financialFreedom +
         data.education +
         data.play +
-        data.give <=
+        data.give) /
+        100 <=
       1,
     {
       message: "The sum of all jars values must not exceed 1",
@@ -103,17 +112,30 @@ const sixJarsFormSchema = z
 export default function SixJars() {
   const form = useForm<z.infer<typeof sixJarsFormSchema>>({
     resolver: zodResolver(sixJarsFormSchema),
-    reValidateMode: "onChange",
-    mode: "onChange",
+    defaultValues: defaultJarsState.config,
   });
 
   return (
     <div className="flex flex-col gap-4 mx-4">
       <TypographyH1>Six Jars Calculator</TypographyH1>
-      <Form {...form}>
-        <SixJarsForm />
-      </Form>
-      <SixJarsSummary />
+      <TypographyP>
+        Discover the power of disciplined saving with the Six Jars method.
+        Embrace a revolutionary approach to managing your finances that ensures
+        your money works for you. Each jar represents a distinct
+        purpose—necessities, long term savings, financial freedom, education,
+        play, and give—to help you achieve balance and financial well-being.
+      </TypographyP>
+      <TypographyP>
+        Start your journey to sustainable financial health today and unlock the
+        secrets of smart money management!
+      </TypographyP>
+
+      <div className="flex flex-col gap-4">
+        <Form {...form}>
+          <SixJarsForm />
+        </Form>
+        <SixJarsSummary />
+      </div>
     </div>
   );
 }
@@ -138,7 +160,7 @@ function PercentageInput({
       name={name}
       render={({ field, fieldState }) => (
         <FormItem>
-          <FormLabel>{label}</FormLabel>
+          <FormLabel htmlFor={field.name}>{label}</FormLabel>
           <FormControl>
             <div className="flex items-center">
               <Input
@@ -166,7 +188,6 @@ function PercentageInput({
     />
   );
 }
-
 export function SixJarsForm() {
   const { state, dispatch } = useSixJarsContext();
   const form = useFormContext<z.infer<typeof sixJarsFormSchema>>();
@@ -181,110 +202,124 @@ export function SixJarsForm() {
 
   return (
     <div className="flex flex-col gap-4">
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="flex flex-col gap-4">
-          <TypographyH2>🔧 Configurations</TypographyH2>
-          <FormField
-            control={form.control}
-            name="income"
-            render={({ field, fieldState }) => (
-              <FormItem>
-                <FormLabel>Income</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter your income"
-                    type="number"
-                    {...field}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      field.onChange(value);
-                      dispatch({
-                        type: "SET_INCOME",
-                        value: +value,
-                      });
-                    }}
-                  />
-                </FormControl>
-                <FormMessage>{fieldState.error?.message}</FormMessage>
-              </FormItem>
-            )}
-          />
-          <div className="flex w-full flex-col gap-4">
-            <PercentageInput
-              name="necessities"
-              label="Necessities"
-              value={toDisplay(state.config.necessities * 100)}
-              placeholder="40 - 55"
-              onChange={() => {
-                dispatch({
-                  type: "SET_NECESSITIES",
-                  value: +form.getValues("necessities") / 100,
-                });
-              }}
-            />
-            <PercentageInput
-              name="longTermSavings"
-              label="Long Term Savings"
-              value={toDisplay(state.config.longTermSavings * 100)}
-              placeholder="10 - 15"
-              onChange={() => {
-                dispatch({
-                  type: "SET_LONGTERMSAVINGS",
-                  value: +form.getValues("longTermSavings") / 100,
-                });
-              }}
-            />
-            <PercentageInput
-              name="financialFreedom"
-              label="Financial Freedom"
-              value={toDisplay(state.config.financialFreedom * 100)}
-              placeholder="10 - 20"
-              onChange={() => {
-                dispatch({
-                  type: "SET_FINANCIALFREEDOM",
-                  value: +form.getValues("financialFreedom") / 100,
-                });
-              }}
-            />
-            <PercentageInput
-              name="education"
-              label="Education"
-              value={toDisplay(state.config.education * 100)}
-              placeholder="10"
-              onChange={() => {
-                dispatch({
-                  type: "SET_EDUCATION",
-                  value: +form.getValues("education") / 100,
-                });
-              }}
-            />
-            <PercentageInput
-              name="play"
-              label="Play"
-              value={toDisplay(state.config.play * 100)}
-              placeholder="10"
-              onChange={() => {
-                dispatch({
-                  type: "SET_GIVE",
-                  value: +form.getValues("give") / 100,
-                });
-              }}
-            />
-            <PercentageInput
-              name="give"
-              label="Give"
-              value={toDisplay(state.config.give * 100)}
-              placeholder="5"
-              onChange={() => {
-                dispatch({
-                  type: "SET_GIVE",
-                  value: +form.getValues("give") / 100,
-                });
-              }}
-            />
-          </div>
-        </div>
-      </form>
+      <Card>
+        <CardHeader>
+          <CardTitle>🔧 Configurations</CardTitle>
+          <CardDescription>
+            Set your income and the percentage of each jar.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={form.handleSubmit(onSubmit)}>
+            <div className="flex flex-col gap-4">
+              <FormField
+                control={form.control}
+                name="income"
+                render={({ field, fieldState }) => (
+                  <FormItem>
+                    <FormLabel htmlFor={field.name}>💰 Income</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Enter your income"
+                        type="number"
+                        {...field}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          field.onChange(value);
+                          dispatch({
+                            type: "SET_INCOME",
+                            value: +value,
+                          });
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage>{fieldState.error?.message}</FormMessage>
+                  </FormItem>
+                )}
+              />
+              <div className="flex w-full flex-col gap-4">
+                <PercentageInput
+                  name="necessities"
+                  label="🛒 Necessities"
+                  value={toDisplay(state.config.necessities * 100)}
+                  placeholder="40 - 55"
+                  onChange={() => {
+                    dispatch({
+                      type: "SET_NECESSITIES",
+                      value: +form.getValues("necessities") / 100,
+                    });
+                  }}
+                />
+                <PercentageInput
+                  name="longTermSavings"
+                  label="🏦 Long Term Savings"
+                  value={toDisplay(state.config.longTermSavings * 100)}
+                  placeholder="10 - 15"
+                  onChange={() => {
+                    dispatch({
+                      type: "SET_LONGTERMSAVINGS",
+                      value: +form.getValues("longTermSavings") / 100,
+                    });
+                  }}
+                />
+                <PercentageInput
+                  name="financialFreedom"
+                  label="🚀 Financial Freedom"
+                  value={toDisplay(state.config.financialFreedom * 100)}
+                  placeholder="10 - 20"
+                  onChange={() => {
+                    dispatch({
+                      type: "SET_FINANCIALFREEDOM",
+                      value: +form.getValues("financialFreedom") / 100,
+                    });
+                  }}
+                />
+                <PercentageInput
+                  name="education"
+                  label="📚 Education"
+                  value={toDisplay(state.config.education * 100)}
+                  placeholder="10"
+                  onChange={() => {
+                    dispatch({
+                      type: "SET_EDUCATION",
+                      value: +form.getValues("education") / 100,
+                    });
+                  }}
+                />
+                <PercentageInput
+                  name="play"
+                  label="🎉 Play"
+                  value={toDisplay(state.config.play * 100)}
+                  placeholder="10 - 20"
+                  onChange={() => {
+                    dispatch({
+                      type: "SET_GIVE",
+                      value: +form.getValues("give") / 100,
+                    });
+                  }}
+                />
+                <PercentageInput
+                  name="give"
+                  label="🎁 Give"
+                  value={toDisplay(state.config.give * 100)}
+                  placeholder="5"
+                  onChange={() => {
+                    dispatch({
+                      type: "SET_GIVE",
+                      value: +form.getValues("give") / 100,
+                    });
+                  }}
+                />
+              </div>
+              <div className="flex w-full flex-row items-center gap-4">
+                <Button className="flex-1" type="submit">
+                  Calculate
+                </Button>
+              </div>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -311,52 +346,65 @@ function SixJarsSummary() {
   ];
 
   return (
-    <div className="flex flex-col gap-4">
-      <TypographyH2>📊 Summary</TypographyH2>
-      <div className="flex flex-row gap-4 [&>div]:flex-1">
-        <SixJarsSummaryPieChart chartData={chartData} />
-        <div className="container mx-auto flex flex-col gap-4">
-          <Card className="transition-shadow hover:shadow-lg">
-            <CardContent>
-              <TypographyP>Necessities: {toDisplay(necessities)}</TypographyP>
-            </CardContent>
-          </Card>
-          <Card className="transition-shadow hover:shadow-lg">
-            <CardContent>
-              <TypographyP>
-                Long Term Savings: {toDisplay(longTermSavings)}
-              </TypographyP>
-            </CardContent>
-          </Card>
-          <Card className="transition-shadow hover:shadow-lg">
-            <CardContent>
-              <TypographyP>Education: {toDisplay(education)}</TypographyP>
-            </CardContent>
-          </Card>
-          <Card className="transition-shadow hover:shadow-lg">
-            <CardContent>
-              <TypographyP>
-                Financial Freedom: {toDisplay(financialFreedom)}
-              </TypographyP>
-            </CardContent>
-          </Card>
-          <Card className="transition-shadow hover:shadow-lg">
-            <CardContent>
-              <TypographyP>Play: {toDisplay(play)}</TypographyP>
-            </CardContent>
-          </Card>
-          <Card className="transition-shadow hover:shadow-lg">
-            <CardContent>
-              <TypographyP>Give: {toDisplay(give)}</TypographyP>
-            </CardContent>
-          </Card>
-          <Card className="transition-shadow hover:shadow-lg">
-            <CardContent>
-              <TypographyP className="font-bold">Total: {total}</TypographyP>
-            </CardContent>
-          </Card>
+    <Card>
+      <CardHeader>
+        <CardTitle>📊 Summary</CardTitle>
+        <CardDescription>
+          This is how you should allocate your income.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-row gap-4 [&>div]:flex-1">
+            <SixJarsSummaryPieChart chartData={chartData} />
+            <div className="container mx-auto flex flex-col gap-4">
+              <Card className="transition-shadow hover:shadow-lg">
+                <CardContent>
+                  <TypographyP>
+                    Necessities: {toDisplay(necessities)}
+                  </TypographyP>
+                </CardContent>
+              </Card>
+              <Card className="transition-shadow hover:shadow-lg">
+                <CardContent>
+                  <TypographyP>
+                    Long Term Savings: {toDisplay(longTermSavings)}
+                  </TypographyP>
+                </CardContent>
+              </Card>
+              <Card className="transition-shadow hover:shadow-lg">
+                <CardContent>
+                  <TypographyP>Education: {toDisplay(education)}</TypographyP>
+                </CardContent>
+              </Card>
+              <Card className="transition-shadow hover:shadow-lg">
+                <CardContent>
+                  <TypographyP>
+                    Financial Freedom: {toDisplay(financialFreedom)}
+                  </TypographyP>
+                </CardContent>
+              </Card>
+              <Card className="transition-shadow hover:shadow-lg">
+                <CardContent>
+                  <TypographyP>Play: {toDisplay(play)}</TypographyP>
+                </CardContent>
+              </Card>
+              <Card className="transition-shadow hover:shadow-lg">
+                <CardContent>
+                  <TypographyP>Give: {toDisplay(give)}</TypographyP>
+                </CardContent>
+              </Card>
+              <Card className="transition-shadow hover:shadow-lg">
+                <CardContent>
+                  <TypographyP className="font-bold">
+                    Total: {total}
+                  </TypographyP>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 }
