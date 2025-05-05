@@ -317,50 +317,48 @@ function SixJarsSummary() {
   return (
     <div className="flex flex-col gap-4">
       <TypographyH2>📊 Summary</TypographyH2>
-      <div className="flex flex-row gap-4">
+      <div className="flex flex-row gap-4 [&>div]:flex-1">
         <SixJarsSummaryPieChart chartData={chartData} />
         <div className="container mx-auto flex flex-col gap-4">
-          <div className="grid grid-cols-3 gap-4">
-            <Card className="transition-shadow hover:shadow-lg">
-              <CardContent>
-                <TypographyP>Necessities: {toDisplay(necessities)}</TypographyP>
-              </CardContent>
-            </Card>
-            <Card className="transition-shadow hover:shadow-lg">
-              <CardContent>
-                <TypographyP>
-                  Long Term Savings: {toDisplay(longTermSavings)}
-                </TypographyP>
-              </CardContent>
-            </Card>
-            <Card className="transition-shadow hover:shadow-lg">
-              <CardContent>
-                <TypographyP>Education: {toDisplay(education)}</TypographyP>
-              </CardContent>
-            </Card>
-            <Card className="transition-shadow hover:shadow-lg">
-              <CardContent>
-                <TypographyP>
-                  Financial Freedom: {toDisplay(financialFreedom)}
-                </TypographyP>
-              </CardContent>
-            </Card>
-            <Card className="transition-shadow hover:shadow-lg">
-              <CardContent>
-                <TypographyP>Play: {toDisplay(play)}</TypographyP>
-              </CardContent>
-            </Card>
-            <Card className="transition-shadow hover:shadow-lg">
-              <CardContent>
-                <TypographyP>Give: {toDisplay(give)}</TypographyP>
-              </CardContent>
-            </Card>
-          </div>
           <Card className="transition-shadow hover:shadow-lg">
             <CardContent>
-              <TypographyP>Total: {total}</TypographyP>
+              <TypographyP>Necessities: {toDisplay(necessities)}</TypographyP>
             </CardContent>
           </Card>
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardContent>
+              <TypographyP>
+                Long Term Savings: {toDisplay(longTermSavings)}
+              </TypographyP>
+            </CardContent>
+          </Card>
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardContent>
+              <TypographyP>Education: {toDisplay(education)}</TypographyP>
+            </CardContent>
+          </Card>
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardContent>
+              <TypographyP>
+                Financial Freedom: {toDisplay(financialFreedom)}
+              </TypographyP>
+            </CardContent>
+          </Card>
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardContent>
+              <TypographyP>Play: {toDisplay(play)}</TypographyP>
+            </CardContent>
+          </Card>
+          <Card className="transition-shadow hover:shadow-lg">
+            <CardContent>
+              <TypographyP>Give: {toDisplay(give)}</TypographyP>
+            </CardContent>
+          </Card>
+            <Card className="transition-shadow hover:shadow-lg">
+              <CardContent>
+                <TypographyP className="font-bold">Total: {total}</TypographyP>
+              </CardContent>
+            </Card>
         </div>
       </div>
     </div>
