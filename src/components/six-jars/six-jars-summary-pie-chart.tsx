@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { TrendingUp } from "lucide-react";
-import { Label, Pie, PieChart } from "recharts";
+import { Cell, Label, Pie, PieChart } from "recharts";
 
 import {
   Card,
@@ -19,32 +19,6 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const chartConfig = {
-  visitors: {
-    label: "Visitors",
-  },
-  necessities: {
-    label: "Chrome",
-    color: "hsl(var(--chart-1))",
-  },
-  give: {
-    label: "Safari",
-    color: "hsl(var(--chart-2))",
-  },
-  play: {
-    label: "Firefox",
-    color: "hsl(var(--chart-3))",
-  },
-  edge: {
-    label: "Edge",
-    color: "hsl(var(--chart-4))",
-  },
-  other: {
-    label: "Other",
-    color: "hsl(var(--chart-5))",
-  },
-} satisfies ChartConfig;
-
 const availableColors = [
   "hsl(var(--chart-1))",
   "hsl(var(--chart-2))",
@@ -59,7 +33,7 @@ function generateChartConfig(data: { key: string }[]): ChartConfig {
   uniqueKeys.forEach((key, index) => {
     config[key] = {
       label: key.charAt(0).toUpperCase() + key.slice(1),
-      color: `hsl(var(--chart-${(index % availableColors.length) + 1}))`,
+      color: availableColors[index % availableColors.length],
     };
   });
   return config;
@@ -107,6 +81,12 @@ export function SixJarsSummaryPieChart({
               innerRadius={60}
               strokeWidth={5}
             >
+              {chartData.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={dynamicChartConfig[entry.key]?.color || "gray"}
+                />
+              ))}
               <Label
                 content={({ viewBox }) => {
                   if (viewBox && "cx" in viewBox && "cy" in viewBox) {
