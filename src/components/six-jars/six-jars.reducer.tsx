@@ -1,8 +1,10 @@
 import { toFixed } from "@/utils/number";
 import { useReducer } from "react";
 
+/*
 const MAX_CONFIG_VALUE = 1;
 const MIN_CONFIG_VALUE = 0;
+ */
 
 export type SixJarsActions =
   | { type: "SET_INCOME"; value: number }
@@ -62,9 +64,6 @@ export const sixJarsReducer = (
   state: typeof defaultJarsState,
   action: SixJarsActions
 ): SixJarsState => {
-  const maxValue = 1;
-  const minValue = 0;
-
   switch (action.type) {
     case "SET_INCOME":
       return { ...state, config: { ...state.config, income: action.value } };
