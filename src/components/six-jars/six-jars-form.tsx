@@ -1,22 +1,14 @@
 "use client";
-import React, { useEffect, useReducer } from "react";
-import {
-  defaultJarsState,
-  sixJarsReducer,
-} from "@/components/six-jars/six-jars.reducer";
+import React, { useEffect } from "react";
 import { toDisplay } from "@/utils/number";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Card, CardContent } from "../ui/card";
-import { cn } from "@/lib/utils";
-import { Slider } from "../ui/slider";
 import { z } from "zod";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -24,17 +16,7 @@ import {
 } from "../ui/form";
 import { useForm, useFormContext } from "react-hook-form";
 import { TypographyH1, TypographyH2, TypographyP } from "../ui/typography";
-import {
-  SixJarsContext,
-  SixJarsProvider,
-  useSixJarsContext,
-} from "./six-jars.provider";
-import {
-  Tooltip,
-  TooltipProvider,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { useSixJarsContext } from "./six-jars.provider";
 
 const sixJarsFormSchema = z
   .object({
@@ -112,34 +94,12 @@ export default function SixJars() {
   const { state } = useSixJarsContext();
 
   return (
-    <Form {...form}>
-      <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 mx-4">
+      <TypographyH1>Six Jars Calculator</TypographyH1>
+      <Form {...form}>
         <SixJarsForm />
-        <SixJarsSummary {...state.summary} />
-      </div>
-    </Form>
-  );
-}
-
-type InputFieldProps = {
-  id: string;
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-} & React.HTMLProps<HTMLInputElement>;
-
-function InputField({ id, label, value, onChange, ...props }: InputFieldProps) {
-  return (
-    <div className="grid w-full max-w-sm items-center gap-1.5">
-      <Label htmlFor={id}>{label}</Label>
-      <div className="flex items-center">
-        <Input
-          id={id}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          {...props}
-        />
-      </div>
+      </Form>
+      <SixJarsSummary {...state.summary} />
     </div>
   );
 }
@@ -191,25 +151,8 @@ function PercentageInput({
       )}
     />
   );
-  // return (
-  //   <div className="grid w-full max-w-sm items-center gap-1.5">
-  //     <div className="flex items-center">
-  //       <Input
-  //         id={id}
-  //         type="number"
-  //         min={0}
-  //         max={100}
-  //         step={1}
-  //         value={value}
-  //         onChange={(e) => onChange(e.target.value)}
-  //         maxLength={2}
-  //         {...rest}
-  //       />
-  //       <span className="ml-1">%</span>
-  //     </div>
-  //   </div>
-  // );
 }
+
 export function SixJarsForm() {
   const { state, dispatch } = useSixJarsContext();
   const form = useFormContext<z.infer<typeof sixJarsFormSchema>>();
