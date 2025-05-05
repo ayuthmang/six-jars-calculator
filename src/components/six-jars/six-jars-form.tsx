@@ -164,18 +164,6 @@ export function SixJarsForm() {
     dispatch({ type: "CALC_SUMMARY" });
   }
 
-  function validateOnChange(value: number) {
-    if (isNaN(value)) return;
-
-    const totalAllowed =
-      Object.values(state.config).reduce((sum, cur) => sum + cur, 0) * 100;
-
-    if (value > totalAllowed) {
-      console.error(`Value cannot exceed ${totalAllowed}`);
-      return;
-    }
-  }
-
   useEffect(() => {
     console.log("useEffect", state.config);
     dispatch({ type: "CALC_SUMMARY" });
@@ -184,34 +172,33 @@ export function SixJarsForm() {
   return (
     <div className="flex flex-col gap-4">
       <form onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
-          control={form.control}
-          name="income"
-          render={({ field, fieldState }) => (
-            <FormItem>
-              <FormLabel>Income</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Enter your income"
-                  type="number"
-                  {...field}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    field.onChange(value);
-                    dispatch({
-                      type: "SET_INCOME",
-                      value: +value,
-                    });
-                  }}
-                />
-              </FormControl>
-              <FormMessage>{fieldState.error?.message}</FormMessage>
-            </FormItem>
-          )}
-        />
-
         <div className="flex flex-col gap-4">
           <TypographyH2>🔧 Configurations</TypographyH2>
+          <FormField
+            control={form.control}
+            name="income"
+            render={({ field, fieldState }) => (
+              <FormItem>
+                <FormLabel>Income</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter your income"
+                    type="number"
+                    {...field}
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      field.onChange(value);
+                      dispatch({
+                        type: "SET_INCOME",
+                        value: +value,
+                      });
+                    }}
+                  />
+                </FormControl>
+                <FormMessage>{fieldState.error?.message}</FormMessage>
+              </FormItem>
+            )}
+          />
           <div className="flex w-full flex-col gap-4">
             <PercentageInput
               name="necessities"
@@ -292,17 +279,7 @@ export function SixJarsForm() {
   );
 }
 
-function SixJarsSummary({
-  ...props
-}: {
-  necessities: number;
-  education: number;
-  longTermSavings: number;
-  financialFreedom: number;
-  play: number;
-  give: number;
-  total: number;
-}) {
+function SixJarsSummary() {
   const {
     necessities,
     education,
@@ -352,7 +329,6 @@ function SixJarsSummary({
           </CardContent>
         </Card>
       </div>
-
       <Card className="transition-shadow hover:shadow-lg">
         <CardContent>
           <TypographyP>Total: {total}</TypographyP>
