@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { toDisplay, toFixed } from "@/utils/number";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,7 @@ import { Button } from "../ui/button";
 import { PercentageInput } from "./percentage-input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { defaultJarsState, type SixJarsState } from "./six-jars-reducer";
+import { loadStoredConfig, saveStoredConfig } from "./six-jars-storage";
 import { JARS } from "./jars";
 
 const percentage = (label: string) =>
@@ -99,8 +100,22 @@ export function SixJarsForm() {
     );
   }
 
+  // Restore the persisted config once on mount. Declared before the save
+  // effect below so the stored value is read before anything overwrites it.
+  const didRestore = useRef(false);
+  useEffect(() => {
+    if (didRestore.current) return;
+    didRestore.current = true;
+    const saved = loadStoredConfig();
+    if (saved) {
+      dispatch({ type: "RESTORE", config: saved });
+      form.reset(toFormValues(saved));
+    }
+  }, [dispatch, form]);
+
   useEffect(() => {
     dispatch({ type: "CALC_SUMMARY" });
+    saveStoredConfig(state.config);
   }, [state.config, dispatch]);
 
   return (

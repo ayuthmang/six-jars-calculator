@@ -3,7 +3,8 @@
 Split your income across the six jars of the classic money-management method
 (T. Harv Eker): **Necessities**, **Long Term Savings**, **Financial Freedom**,
 **Education**, **Play**, and **Give**. Enter your income, tune the percentages,
-and see the allocation per jar with a live summary and pie chart.
+and see the allocation per jar with a live summary and pie chart. Your
+configuration is saved locally in the browser, so it survives reloads.
 
 Built with [Next.js](https://nextjs.org) (App Router), React Hook Form + Zod,
 Tailwind CSS, [shadcn/ui](https://ui.shadcn.com), and Recharts.

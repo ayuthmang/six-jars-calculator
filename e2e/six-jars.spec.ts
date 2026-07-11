@@ -138,6 +138,26 @@ test.describe("pie chart", () => {
   });
 });
 
+test.describe("persistence", () => {
+  test("restores income and percentages after a reload", async ({ page }) => {
+    await income(page).fill("3000");
+    await jar(page, /Play/).fill("15");
+    // Summary reflecting the change means the state (and its save) settled.
+    await expect(summaryRow(page, "Play")).toContainText("450");
+
+    await page.reload();
+
+    await expect(income(page)).toHaveValue("3000");
+    await expect(jar(page, /Play/)).toHaveValue("15");
+    await expect(summaryRow(page, "Play")).toContainText("450");
+  });
+
+  test("starts from defaults when nothing is saved", async ({ page }) => {
+    await expect(income(page)).toHaveValue("0");
+    await expect(jar(page, /Necessities/)).toHaveValue("55");
+  });
+});
+
 test.describe("percentage sum warning", () => {
   // Next.js injects its own role="alert" route announcer, so scope by text.
   const sumWarning = (page: Page) =>
