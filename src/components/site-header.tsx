@@ -3,6 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { JARS } from "@/components/six-jars/jars";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 const LINKS = [
   { href: "/", label: "Calculator" },
@@ -30,8 +31,9 @@ export function SiteHeader() {
           </span>
           Six Jars
         </Link>
-        <nav aria-label="Main" className="flex items-center gap-1">
-          {LINKS.map(({ href, label }) => {
+        <div className="flex items-center gap-1">
+          <nav aria-label="Main" className="flex items-center gap-1">
+            {LINKS.map(({ href, label }) => {
             const isCurrent = pathname === href;
             return (
               <Link
@@ -44,12 +46,14 @@ export function SiteHeader() {
                     ? "bg-muted text-foreground font-medium"
                     : "text-muted-foreground hover:text-foreground"
                 )}
-              >
-                {label}
-              </Link>
-            );
-          })}
-        </nav>
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </nav>
+          <ThemeToggle />
+        </div>
       </div>
     </header>
   );
