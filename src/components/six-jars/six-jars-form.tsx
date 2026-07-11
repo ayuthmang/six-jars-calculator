@@ -61,7 +61,8 @@ const FORM_ID = "six-jars-form";
 
 function toFormValues(config: SixJarsState["config"]) {
   return {
-    income: config.income,
+    // Empty string keeps the placeholder visible instead of a lonely 0.
+    income: config.income === 0 ? "" : config.income,
     necessities: toFixed(config.necessities * 100),
     longTermSavings: toFixed(config.longTermSavings * 100),
     financialFreedom: toFixed(config.financialFreedom * 100),
@@ -121,7 +122,9 @@ export function SixJarsForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>🔧 Configure</CardTitle>
+        <CardTitle>
+          <h2>Configure</h2>
+        </CardTitle>
         <CardDescription>
           Set your income and tune each jar — results update live.
         </CardDescription>
@@ -137,14 +140,14 @@ export function SixJarsForm() {
             id={FORM_ID}
             noValidate
             onReset={handleFormReset}
-            className="flex flex-col gap-5"
+            className="flex flex-col gap-4"
           >
             <FormField
               control={form.control}
               name="income"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>💰 Income</FormLabel>
+                  <FormLabel>Income</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Enter your income"

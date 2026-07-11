@@ -5,6 +5,7 @@ import {
   FormItem,
   FormLabel,
   FormControl,
+  FormDescription,
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
@@ -30,13 +31,14 @@ export function PercentageInput({
       name={name}
       render={({ field }) => {
         const numericValue = Number(field.value);
+        const percent = Number.isNaN(numericValue) ? 0 : numericValue;
         return (
           <FormItem>
             <div className="flex items-end justify-between gap-3">
               <div className="space-y-0.5">
                 <FormLabel>{label}</FormLabel>
                 {hint && (
-                  <p className="text-muted-foreground text-xs">{hint}</p>
+                  <FormDescription className="text-xs">{hint}</FormDescription>
                 )}
               </div>
               <div className="flex items-center gap-1">
@@ -61,7 +63,8 @@ export function PercentageInput({
             </div>
             <Slider
               aria-label={label}
-              value={[Number.isNaN(numericValue) ? 0 : numericValue]}
+              aria-valuetext={`${percent}%`}
+              value={[percent]}
               min={0}
               max={100}
               step={0.5}

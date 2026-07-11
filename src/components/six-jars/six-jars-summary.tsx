@@ -1,12 +1,6 @@
 "use client";
 import { toDisplay, toFixed } from "@/utils/number";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { SixJarsSummaryPieChart } from "./six-jars-summary-pie-chart";
 import { useSixJarsContext } from "./six-jars-provider";
 import { JARS } from "./jars";
@@ -25,17 +19,19 @@ export function SixJarsSummary() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>📊 Your allocation</CardTitle>
-        <CardDescription>
-          How your income splits across the jars.
-        </CardDescription>
+        <CardTitle>
+          <h2>Your allocation</h2>
+        </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
         {summary.total > 0 ? (
-          <SixJarsSummaryPieChart
-            chartData={chartData}
-            centerLabel={toDisplay(summary.total)}
-          />
+          // The legend below carries the same data for assistive tech.
+          <div aria-hidden>
+            <SixJarsSummaryPieChart
+              chartData={chartData}
+              centerLabel={toDisplay(summary.total)}
+            />
+          </div>
         ) : (
           <div className="border-muted mx-auto flex aspect-square w-full max-w-[280px] items-center justify-center rounded-full border-2 border-dashed">
             <p className="text-muted-foreground max-w-[70%] text-center text-sm">
@@ -61,7 +57,10 @@ export function SixJarsSummary() {
             </li>
           ))}
         </ul>
-        <div className="flex items-center justify-between border-t pt-4 text-sm font-semibold">
+        <div
+          aria-live="polite"
+          className="flex items-center justify-between border-t pt-4 font-semibold"
+        >
           <span>Total</span>
           <span data-testid="summary-total" className="tabular-nums">
             {toDisplay(summary.total)}

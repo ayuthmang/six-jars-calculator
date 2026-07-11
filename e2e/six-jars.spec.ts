@@ -153,8 +153,42 @@ test.describe("persistence", () => {
   });
 
   test("starts from defaults when nothing is saved", async ({ page }) => {
-    await expect(income(page)).toHaveValue("0");
+    // Empty income keeps the placeholder visible instead of a lonely 0.
+    await expect(income(page)).toHaveValue("");
     await expect(jar(page, /Necessities/)).toHaveValue("55");
+  });
+});
+
+test.describe("accessibility", () => {
+  test("cards use real headings under a single h1", async ({ page }) => {
+    await expect(
+      page.getByRole("heading", { level: 1, name: /Six Jars Calculator/ })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Configure" })
+    ).toBeVisible();
+    await expect(
+      page.getByRole("heading", { level: 2, name: "Your allocation" })
+    ).toBeVisible();
+  });
+
+  test("jar hints are exposed as input descriptions", async ({ page }) => {
+    await expect(jar(page, /Necessities/)).toHaveAccessibleDescription(
+      /rent, bills, groceries/i
+    );
+  });
+
+  test("sliders announce percentage values", async ({ page }) => {
+    await expect(
+      page.getByRole("slider", { name: /Necessities/ })
+    ).toHaveAttribute("aria-valuetext", "55%");
+  });
+
+  test("the total announces updates politely", async ({ page }) => {
+    await income(page).fill("1000");
+    await expect(
+      page.locator('[aria-live="polite"]').filter({ hasText: "Total" })
+    ).toContainText("1,000");
   });
 });
 
