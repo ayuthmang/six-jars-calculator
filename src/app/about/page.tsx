@@ -95,7 +95,7 @@ export default function AboutPage() {
 
         {/* The jars */}
         <Reveal>
-          <section id="the-jars" className="flex flex-col gap-6 scroll-mt-8">
+          <section id="the-jars" className="flex flex-col gap-6 scroll-mt-24">
             <div className="flex flex-col gap-2 text-center">
               <h2 className="text-2xl font-bold tracking-tight">The six jars</h2>
               <p className="text-muted-foreground">

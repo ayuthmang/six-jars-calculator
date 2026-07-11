@@ -64,3 +64,32 @@ test.describe("calculator to about", () => {
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 });
+
+test.describe("site navigation", () => {
+  test("header navigates between calculator and about", async ({ page }) => {
+    await page.goto("/");
+    const header = page.getByRole("banner");
+    await expect(
+      header.getByRole("link", { name: "Six Jars", exact: true })
+    ).toBeVisible();
+
+    await header.getByRole("link", { name: /why six jars/i }).click();
+    await expect(page).toHaveURL(/\/about$/);
+
+    await header.getByRole("link", { name: "Calculator" }).click();
+    await expect(page).toHaveURL(/\/$/);
+    await expect(
+      page.getByRole("spinbutton", { name: /Income/ })
+    ).toBeVisible();
+  });
+
+  test("marks the current page in the nav", async ({ page }) => {
+    await page.goto("/about");
+    await expect(
+      page.getByRole("banner").getByRole("link", { name: /why six jars/i })
+    ).toHaveAttribute("aria-current", "page");
+    await expect(
+      page.getByRole("banner").getByRole("link", { name: "Calculator" })
+    ).not.toHaveAttribute("aria-current", "page");
+  });
+});
