@@ -1,27 +1,24 @@
-"use client";
-
-import { TypographyH1, TypographyP } from "../ui/typography";
+import { TypographyH1 } from "../ui/typography";
 import { SixJarsForm } from "./six-jars-form";
 import { SixJarsSummary } from "./six-jars-summary";
 
 export default function SixJarsApp() {
   return (
-    <div className="flex flex-col gap-4 mx-4">
-      <TypographyH1>Six Jars Calculator</TypographyH1>
-      <TypographyP>
-        Discover the power of disciplined saving with the Six Jars method.
-        Embrace a revolutionary approach to managing your finances that ensures
-        your money works for you. Each jar represents a distinct
-        purpose—necessities, long term savings, financial freedom, education,
-        play, and give—to help you achieve balance and financial well-being.
-      </TypographyP>
-      <TypographyP>
-        Start your journey to sustainable financial health today and unlock the
-        secrets of smart money management!
-      </TypographyP>
-      <div className="flex flex-col gap-4 lg:flex-row lg:[&>*]:flex-1">
+    <div className="flex flex-col gap-6">
+      <header className="flex flex-col gap-2">
+        <TypographyH1 className="text-3xl sm:text-4xl">
+          Six Jars Calculator
+        </TypographyH1>
+        <p className="text-muted-foreground max-w-2xl leading-7">
+          Split your income across the six jars of the classic money-management
+          method. Tune the percentages and watch your allocation update live.
+        </p>
+      </header>
+      <div className="grid items-start gap-6 lg:grid-cols-2">
         <SixJarsForm />
-        <SixJarsSummary />
+        <div className="lg:sticky lg:top-6">
+          <SixJarsSummary />
+        </div>
       </div>
     </div>
   );

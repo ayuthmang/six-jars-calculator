@@ -1,8 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { Cell, Pie, PieChart } from "recharts";
+import { Cell, Label, Pie, PieChart } from "recharts";
 
+import { cn } from "@/lib/utils";
 import {
   ChartConfig,
   ChartContainer,
@@ -10,54 +11,78 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart";
 
-const availableColors = [
-  "var(--chart-1)",
-  "var(--chart-2)",
-  "var(--chart-3)",
-  "var(--chart-4)",
-  "var(--chart-5)",
-];
-
-function generateChartConfig(data: { key: string }[]): ChartConfig {
-  const uniqueKeys = Array.from(new Set(data.map((item) => item.key)));
-  const config: ChartConfig = {};
-  uniqueKeys.forEach((key, index) => {
-    config[key] = {
-      label: key.charAt(0).toUpperCase() + key.slice(1),
-      color: availableColors[index % availableColors.length],
-    };
-  });
-  return config;
-}
+type SliceDatum = {
+  key: string;
+  label: string;
+  value: number;
+  color: string;
+};
 
 export function SixJarsSummaryPieChart({
   chartData,
+  centerLabel,
 }: {
-  chartData: {
-    key: string;
-    value: number;
-    fill?: string;
-  }[];
+  chartData: SliceDatum[];
+  centerLabel: string;
 }) {
-  const dynamicChartConfig = React.useMemo(
-    () => generateChartConfig(chartData),
-    [chartData]
-  );
+  const config = React.useMemo(() => {
+    const result: ChartConfig = {};
+    for (const item of chartData) {
+      result[item.key] = { label: item.label, color: item.color };
+    }
+    return result;
+  }, [chartData]);
 
   return (
     <ChartContainer
-      config={dynamicChartConfig}
-      className="mx-auto aspect-square min-h-[250px] max-h-full min-w-80 pb-0 [&_.recharts-pie-label-text]:fill-foreground"
+      config={config}
+      className="mx-auto aspect-square w-full max-w-[280px]"
     >
       <PieChart>
         <ChartTooltip content={<ChartTooltipContent hideLabel />} />
-        <Pie data={chartData} nameKey="key" dataKey="value" label>
-          {chartData.map((entry, index) => (
-            <Cell
-              key={`cell-${index}`}
-              fill={dynamicChartConfig[entry.key]?.color}
-            />
+        <Pie
+          data={chartData}
+          nameKey="key"
+          dataKey="value"
+          innerRadius="58%"
+          paddingAngle={2}
+          cornerRadius={4}
+        >
+          {chartData.map((entry) => (
+            <Cell key={entry.key} fill={entry.color} />
           ))}
+          <Label
+            content={({ viewBox }) => {
+              if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                return (
+                  <text
+                    x={viewBox.cx}
+                    y={viewBox.cy}
+                    textAnchor="middle"
+                    dominantBaseline="middle"
+                  >
+                    <tspan
+                      x={viewBox.cx}
+                      y={viewBox.cy}
+                      className={cn(
+                        "fill-foreground font-bold",
+                        centerLabel.length > 9 ? "text-sm" : "text-xl"
+                      )}
+                    >
+                      {centerLabel}
+                    </tspan>
+                    <tspan
+                      x={viewBox.cx}
+                      y={(viewBox.cy || 0) + 20}
+                      className="fill-muted-foreground text-xs"
+                    >
+                      Total
+                    </tspan>
+                  </text>
+                );
+              }
+            }}
+          />
         </Pie>
       </PieChart>
     </ChartContainer>

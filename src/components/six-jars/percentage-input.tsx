@@ -8,52 +8,72 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import { Slider } from "../ui/slider";
 
 export function PercentageInput({
   name,
   label,
-  value,
+  hint,
   onChange,
   ...props
 }: {
   name: string;
   label: string;
-  value: string;
+  hint?: string;
   onChange: (value: string) => void;
-} & React.HTMLProps<HTMLInputElement>) {
+} & Omit<React.HTMLProps<HTMLInputElement>, "name" | "value" | "onChange">) {
   const form = useFormContext();
 
   return (
     <FormField
       control={form.control}
       name={name}
-      render={({ field, fieldState }) => (
-        <FormItem>
-          <FormLabel htmlFor={field.name}>{label}</FormLabel>
-          <FormControl>
-            <div className="flex items-center">
-              <Input
-                id={field.name}
-                type="number"
-                min={0}
-                max={100}
-                step={1}
-                maxLength={2}
-                {...props}
-                {...field}
-                value={value ?? field.value}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  field.onChange(value);
-                  onChange(value);
-                }}
-              />
-              <span className="ml-1">%</span>
+      render={({ field }) => {
+        const numericValue = Number(field.value);
+        return (
+          <FormItem>
+            <div className="flex items-end justify-between gap-3">
+              <div className="space-y-0.5">
+                <FormLabel>{label}</FormLabel>
+                {hint && (
+                  <p className="text-muted-foreground text-xs">{hint}</p>
+                )}
+              </div>
+              <div className="flex items-center gap-1">
+                <FormControl>
+                  <Input
+                    type="number"
+                    inputMode="decimal"
+                    min={0}
+                    max={100}
+                    step="any"
+                    className="w-20 text-right"
+                    {...props}
+                    {...field}
+                    onChange={(e) => {
+                      field.onChange(e.target.value);
+                      onChange(e.target.value);
+                    }}
+                  />
+                </FormControl>
+                <span className="text-muted-foreground text-sm">%</span>
+              </div>
             </div>
-          </FormControl>
-          <FormMessage>{fieldState.error?.message}</FormMessage>
-        </FormItem>
-      )}
+            <Slider
+              aria-label={label}
+              value={[Number.isNaN(numericValue) ? 0 : numericValue]}
+              min={0}
+              max={100}
+              step={0.5}
+              onValueChange={([value]) => {
+                field.onChange(value);
+                onChange(String(value));
+              }}
+            />
+            <FormMessage />
+          </FormItem>
+        );
+      }}
     />
   );
 }

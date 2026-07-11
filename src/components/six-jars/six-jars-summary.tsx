@@ -1,5 +1,5 @@
 "use client";
-import { toDisplay } from "@/utils/number";
+import { toDisplay, toFixed } from "@/utils/number";
 import {
   Card,
   CardContent,
@@ -7,89 +7,65 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { TypographyP } from "../ui/typography";
 import { SixJarsSummaryPieChart } from "./six-jars-summary-pie-chart";
 import { useSixJarsContext } from "./six-jars-provider";
+import { JARS } from "./jars";
 
 export function SixJarsSummary() {
   const { state } = useSixJarsContext();
-  const {
-    necessities,
-    education,
-    longTermSavings,
-    financialFreedom,
-    play,
-    give,
-    total,
-  } = state.summary;
+  const { summary, config } = state;
 
-  const chartData = [
-    { key: "necessities", value: necessities },
-    { key: "longTermSavings", value: longTermSavings },
-    { key: "education", value: education },
-    { key: "financialFreedom", value: financialFreedom },
-    { key: "play", value: play },
-    { key: "give", value: give },
-  ];
+  const chartData = JARS.map((jar) => ({
+    key: jar.key,
+    label: jar.label,
+    value: summary[jar.key],
+    color: jar.color,
+  }));
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>📊 Summary</CardTitle>
+        <CardTitle>📊 Your allocation</CardTitle>
         <CardDescription>
-          This is how you should allocate your income.
+          How your income splits across the jars.
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-row gap-4 [&>div]:flex-1 lg:flex-col">
-            <SixJarsSummaryPieChart chartData={chartData} />
-            <div className="container mx-auto flex flex-col gap-4">
-              <Card className="transition-shadow hover:shadow-lg">
-                <CardContent>
-                  <TypographyP>
-                    Necessities: {toDisplay(necessities)}
-                  </TypographyP>
-                </CardContent>
-              </Card>
-              <Card className="transition-shadow hover:shadow-lg">
-                <CardContent>
-                  <TypographyP>
-                    Long Term Savings: {toDisplay(longTermSavings)}
-                  </TypographyP>
-                </CardContent>
-              </Card>
-              <Card className="transition-shadow hover:shadow-lg">
-                <CardContent>
-                  <TypographyP>Education: {toDisplay(education)}</TypographyP>
-                </CardContent>
-              </Card>
-              <Card className="transition-shadow hover:shadow-lg">
-                <CardContent>
-                  <TypographyP>
-                    Financial Freedom: {toDisplay(financialFreedom)}
-                  </TypographyP>
-                </CardContent>
-              </Card>
-              <Card className="transition-shadow hover:shadow-lg">
-                <CardContent>
-                  <TypographyP>Play: {toDisplay(play)}</TypographyP>
-                </CardContent>
-              </Card>
-              <Card className="transition-shadow hover:shadow-lg">
-                <CardContent>
-                  <TypographyP>Give: {toDisplay(give)}</TypographyP>
-                </CardContent>
-              </Card>
-              <Card className="transition-shadow hover:shadow-lg">
-                <CardContent>
-                  <TypographyP className="font-bold">
-                    Total: {total}
-                  </TypographyP>
-                </CardContent>
-              </Card>
-            </div>
+      <CardContent className="flex flex-col gap-6">
+        {summary.total > 0 ? (
+          <SixJarsSummaryPieChart
+            chartData={chartData}
+            centerLabel={toDisplay(summary.total)}
+          />
+        ) : (
+          <div className="border-muted mx-auto flex aspect-square w-full max-w-[280px] items-center justify-center rounded-full border-2 border-dashed">
+            <p className="text-muted-foreground max-w-[70%] text-center text-sm">
+              Enter your income to see the breakdown
+            </p>
           </div>
+        )}
+        <ul className="flex flex-col gap-2.5">
+          {JARS.map((jar) => (
+            <li key={jar.key} className="flex items-center gap-2.5 text-sm">
+              <span
+                aria-hidden
+                className="size-2.5 shrink-0 rounded-full"
+                style={{ background: jar.color }}
+              />
+              <span className="truncate">{jar.label}</span>
+              <span className="text-muted-foreground text-xs tabular-nums">
+                {toDisplay(toFixed(config[jar.key] * 100))}%
+              </span>
+              <span className="ml-auto font-medium tabular-nums">
+                {toDisplay(summary[jar.key])}
+              </span>
+            </li>
+          ))}
+        </ul>
+        <div className="flex items-center justify-between border-t pt-4 text-sm font-semibold">
+          <span>Total</span>
+          <span data-testid="summary-total" className="tabular-nums">
+            {toDisplay(summary.total)}
+          </span>
         </div>
       </CardContent>
     </Card>
