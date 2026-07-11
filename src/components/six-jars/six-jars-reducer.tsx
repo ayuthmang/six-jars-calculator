@@ -1,5 +1,6 @@
 import { toFixed } from "@/utils/number";
 import { useReducer } from "react";
+import { JARS } from "./jars";
 
 export type SixJarsActions =
   | { type: "SET_INCOME"; value: number }
@@ -34,15 +35,18 @@ export type SixJarsState = {
   };
 };
 
+const shareOf = (key: (typeof JARS)[number]["key"]) =>
+  JARS.find((jar) => jar.key === key)!.share;
+
 export const defaultJarsState: SixJarsState = {
   config: {
     income: 0,
-    necessities: 0.55,
-    education: 0.1,
-    longTermSavings: 0.1,
-    financialFreedom: 0.1,
-    play: 0.1,
-    give: 0.05,
+    necessities: shareOf("necessities"),
+    education: shareOf("education"),
+    longTermSavings: shareOf("longTermSavings"),
+    financialFreedom: shareOf("financialFreedom"),
+    play: shareOf("play"),
+    give: shareOf("give"),
   },
   summary: {
     necessities: 0,
