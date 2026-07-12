@@ -159,6 +159,42 @@ test.describe("persistence", () => {
   });
 });
 
+test.describe("presets", () => {
+  test("applying a preset sets the whole split", async ({ page }) => {
+    await income(page).fill("1000");
+    await page.getByRole("button", { name: "Aggressive saver" }).click();
+
+    await expect(jar(page, /Necessities/)).toHaveValue("45");
+    await expect(jar(page, /Financial Freedom/)).toHaveValue("20");
+    await expect(summaryRow(page, "Financial Freedom")).toContainText("200");
+    // Presets always sum to 100 — no warning.
+    await expect(
+      page.getByRole("alert").filter({ hasText: /add up/i })
+    ).toHaveCount(0);
+  });
+
+  test("the matching preset is marked active", async ({ page }) => {
+    // Defaults are the classic split.
+    await expect(
+      page.getByRole("button", { name: "Classic" })
+    ).toHaveAttribute("aria-pressed", "true");
+
+    await page.getByRole("button", { name: "Tight budget" }).click();
+    await expect(
+      page.getByRole("button", { name: "Tight budget" })
+    ).toHaveAttribute("aria-pressed", "true");
+    await expect(
+      page.getByRole("button", { name: "Classic" })
+    ).toHaveAttribute("aria-pressed", "false");
+
+    // A custom tweak deactivates all presets.
+    await jar(page, /Play/).fill("7");
+    await expect(
+      page.getByRole("button", { name: "Tight budget" })
+    ).toHaveAttribute("aria-pressed", "false");
+  });
+});
+
 test.describe("accessibility", () => {
   test("cards use real headings under a single h1", async ({ page }) => {
     await expect(

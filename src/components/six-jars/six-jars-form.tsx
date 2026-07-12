@@ -30,6 +30,7 @@ import { defaultJarsState, type SixJarsState } from "./six-jars-reducer";
 import { loadStoredConfig, saveStoredConfig } from "./six-jars-storage";
 import { parseConfigParam, SHARE_PARAM } from "./six-jars-url";
 import { JARS } from "./jars";
+import { PRESETS, type Preset } from "./presets";
 
 const percentage = (label: string) =>
   z.coerce
@@ -100,6 +101,23 @@ export function SixJarsForm() {
     form.reset(
       toFormValues({ ...defaultJarsState.config, income: state.config.income })
     );
+  }
+
+  const activePresetKey = PRESETS.find((preset) =>
+    JARS.every(
+      (jar) => Math.abs(config[jar.key] * 100 - preset.percents[jar.key]) < 0.005
+    )
+  )?.key;
+
+  function applyPreset(preset: Preset) {
+    const nextConfig = {
+      ...config,
+      ...Object.fromEntries(
+        JARS.map((jar) => [jar.key, preset.percents[jar.key] / 100])
+      ),
+    };
+    dispatch({ type: "RESTORE", config: nextConfig });
+    form.reset(toFormValues(nextConfig));
   }
 
   // Restore config once on mount: a share URL wins over the persisted copy.
@@ -177,6 +195,26 @@ export function SixJarsForm() {
                 </FormItem>
               )}
             />
+            <div className="flex flex-col gap-2">
+              <span className="text-muted-foreground text-xs">Presets</span>
+              <div className="flex flex-wrap gap-2">
+                {PRESETS.map((preset) => {
+                  const isActive = preset.key === activePresetKey;
+                  return (
+                    <Button
+                      key={preset.key}
+                      type="button"
+                      size="sm"
+                      variant={isActive ? "default" : "outline"}
+                      aria-pressed={isActive}
+                      onClick={() => applyPreset(preset)}
+                    >
+                      {preset.label}
+                    </Button>
+                  );
+                })}
+              </div>
+            </div>
             {JARS.map(({ key, label, hint, placeholder, action }) => (
               <PercentageInput
                 key={key}
