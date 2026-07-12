@@ -28,6 +28,7 @@ import { PercentageInput } from "./percentage-input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { defaultJarsState, type SixJarsState } from "./six-jars-reducer";
 import { loadStoredConfig, saveStoredConfig } from "./six-jars-storage";
+import { parseConfigParam, SHARE_PARAM } from "./six-jars-url";
 import { JARS } from "./jars";
 
 const percentage = (label: string) =>
@@ -101,13 +102,17 @@ export function SixJarsForm() {
     );
   }
 
-  // Restore the persisted config once on mount. Declared before the save
-  // effect below so the stored value is read before anything overwrites it.
+  // Restore config once on mount: a share URL wins over the persisted copy.
+  // Declared before the save effect below so the stored value is read before
+  // anything overwrites it.
   const didRestore = useRef(false);
   useEffect(() => {
     if (didRestore.current) return;
     didRestore.current = true;
-    const saved = loadStoredConfig();
+    const shared = parseConfigParam(
+      new URLSearchParams(window.location.search).get(SHARE_PARAM)
+    );
+    const saved = shared ?? loadStoredConfig();
     if (saved) {
       dispatch({ type: "RESTORE", config: saved });
       form.reset(toFormValues(saved));

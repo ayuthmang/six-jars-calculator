@@ -1,7 +1,14 @@
 "use client";
 import { toDisplay, toFixed } from "@/utils/number";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import {
+  Card,
+  CardAction,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
 import { SixJarsSummaryPieChart } from "./six-jars-summary-pie-chart";
+import { ShareLinkButton } from "./share-link-button";
 import { useSixJarsContext } from "./six-jars-provider";
 import { JARS } from "./jars";
 
@@ -22,6 +29,9 @@ export function SixJarsSummary() {
         <CardTitle>
           <h2>Your allocation</h2>
         </CardTitle>
+        <CardAction>
+          <ShareLinkButton />
+        </CardAction>
       </CardHeader>
       <CardContent className="flex flex-col gap-6">
         {summary.total > 0 ? (

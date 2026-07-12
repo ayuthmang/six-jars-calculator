@@ -3,8 +3,9 @@ import type { SixJarsState } from "./six-jars-reducer";
 
 const STORAGE_KEY = "six-jars:config:v1";
 
-// Validate stored data so corrupt or outdated entries fall back to defaults.
-const storedConfigSchema = z.object({
+// Validates any externally-sourced config (localStorage, share URLs) so
+// corrupt or outdated data falls back to defaults.
+export const configSchema = z.object({
   income: z.number().min(0),
   necessities: z.number().min(0).max(1),
   longTermSavings: z.number().min(0).max(1),
@@ -19,7 +20,7 @@ export function loadStoredConfig(): SixJarsState["config"] | null {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
-    const parsed = storedConfigSchema.safeParse(JSON.parse(raw));
+    const parsed = configSchema.safeParse(JSON.parse(raw));
     return parsed.success ? parsed.data : null;
   } catch {
     return null;
