@@ -1,22 +1,63 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
+
+async function chooseTheme(page: Page, name: RegExp) {
+  await page.getByRole("button", { name: /theme/i }).click();
+  await page.getByRole("menuitemradio", { name }).click();
+}
 
 test.describe("theme", () => {
-  test("toggle switches to dark mode and persists across reloads", async ({
+  test("follows a dark OS by default", async ({ browser }) => {
+    const context = await browser.newContext({ colorScheme: "dark" });
+    const page = await context.newPage();
+    await page.goto("/");
+    await expect(page.locator("html")).toHaveClass(/dark/);
+    await context.close();
+  });
+
+  test("follows a light OS by default", async ({ page }) => {
+    // Playwright's default colorScheme is light.
+    await page.goto("/");
+    await expect(page.locator("html")).not.toHaveClass(/dark/);
+  });
+
+  test("offers light, dark and system choices with system preselected", async ({
     page,
   }) => {
     await page.goto("/");
-    const html = page.locator("html");
-    const toggle = page.getByRole("button", { name: /toggle theme/i });
+    await page.getByRole("button", { name: /theme/i }).click();
+    await expect(
+      page.getByRole("menuitemradio", { name: "System" })
+    ).toHaveAttribute("aria-checked", "true");
+    await expect(
+      page.getByRole("menuitemradio", { name: "Light" })
+    ).toHaveAttribute("aria-checked", "false");
+    await expect(
+      page.getByRole("menuitemradio", { name: "Dark" })
+    ).toHaveAttribute("aria-checked", "false");
+  });
 
-    await expect(toggle).toBeVisible();
-    await toggle.click();
-    await expect(html).toHaveClass(/dark/);
+  test("an explicit choice overrides the OS and persists", async ({
+    page,
+  }) => {
+    await page.goto("/");
+    await chooseTheme(page, /dark/i);
+    await expect(page.locator("html")).toHaveClass(/dark/);
 
     await page.reload();
-    await expect(html).toHaveClass(/dark/);
+    await expect(page.locator("html")).toHaveClass(/dark/);
+  });
 
-    await page.getByRole("button", { name: /toggle theme/i }).click();
-    await expect(html).not.toHaveClass(/dark/);
+  test("choosing system returns to following the OS", async ({ browser }) => {
+    const context = await browser.newContext({ colorScheme: "dark" });
+    const page = await context.newPage();
+    await page.goto("/");
+
+    await chooseTheme(page, /light/i);
+    await expect(page.locator("html")).not.toHaveClass(/dark/);
+
+    await chooseTheme(page, /system/i);
+    await expect(page.locator("html")).toHaveClass(/dark/);
+    await context.close();
   });
 
   test("dark mode restyles the page background", async ({ page }) => {
@@ -25,7 +66,7 @@ test.describe("theme", () => {
       page.evaluate(() => getComputedStyle(document.body).backgroundColor);
 
     const lightBg = await bgOf();
-    await page.getByRole("button", { name: /toggle theme/i }).click();
+    await chooseTheme(page, /dark/i);
     await expect(page.locator("html")).toHaveClass(/dark/);
 
     expect(await bgOf()).not.toBe(lightBg);
